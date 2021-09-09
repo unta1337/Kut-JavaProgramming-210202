@@ -92,7 +92,7 @@ public class Baseball {
 	static boolean done() {
 		System.out.print("새 게임(y/n)? ");
 		
-		// Scanner는 버퍼에 저장된 값을 읽어오므로 게임 종료 이후에는 사용자 입력이 없어 NoSuchElement 예외를 발생시킨다.
+		// Scanner는 System.in의 버퍼를 이용해 값을 읽어오므로 한번 Scanner를 close하면 더 이상 값을 읽어올 수 없어 NoSuchElemet예외를 발생시킨다.
 		// 따라서 Scanner를 전역으로 선언, 버퍼에 남아 있는 값을 불러올 수 있게 함으로써 에외를 방지한다.
 		String s = _in.next();
 		
