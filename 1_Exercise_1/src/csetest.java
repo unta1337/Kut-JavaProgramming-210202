@@ -4,7 +4,7 @@ class CSE {
 	
 	public void setTitle(String title) {
 		// 기존의 _title을 이용한 변수 구분도 사용할 수 있으나, this 포인터를 이용해 인수와 인스턴스 변수를 구분할 수 있다.
-		title = this.title;
+		this.title = title;
 	}
 	
 	// 함수의 반환 타입을 명시해야 한다.
