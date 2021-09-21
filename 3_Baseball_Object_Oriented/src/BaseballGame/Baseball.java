@@ -6,61 +6,66 @@ import java.util.Scanner;
 import java.util.regex.Pattern;			// 사용자 입력에서 Y/N을 구분하기 위해 정규식 사용.
 
 // 사용자가 실제로 사용할 사용자와 play 함수를 제외한 모든 멤버 변수, 함수, 클래스들을 private으로 선언.
-// System.in을 사용하는 Scanner 때문에 생성자를 이용해 외부의 Scanner를 불러와 사용.
 public class Baseball {
 	// Scanner와 N에 대한 정규식 표현은 변할 일이 없으므로 final로 선언.
-	private final Scanner in;
-	private final String noExpr = "(no|No|nO|NO|n|N)";
+	private static final Scanner in = new Scanner(System.in);
+	private static final String noExpr = "([Nn][Oo]|[Nn])";
+	private static final String yesExpr = "([Yy][Ee][Ss]|[Yy])";
 	
-	private int[] bat;
-	private int[] ball;
-	private int result;
-	private int out;
+	private static int[] bat;
+	private static int[] ball;
+	private static int result;
+	private static int out;
 	
-	public Baseball(Scanner in) {
-		this.in = in;
-		
-		bat = new int[3];
-		ball = new int[3];
-		out = 0;
-	}
-	
-	public void play() {
+	// 사용자 입력에 대한 예외를 처리하기 위한 예외 선언.
+	public static void play() throws Exception {
 		do {
-			playGame();
-		} while (!done());
+			PlayerInteraction.playGame();
+		} while (!PlayerInteraction.done());
 	}
 
-	private void playGame() {
-		GameLogics.pitch(ball);
-		
-		while (true) {
-			System.out.print("[0-9]까지 숫자 3개를 입력하시오: ");
-			for (int i = 0; i < 3; i++) {
-				bat[i] = in.nextInt();
-			}
-			result = GameLogics.compare(ball, bat);
+	private class PlayerInteraction {
+		private static void playGame() {
+			bat = new int[3];
+			ball = new int[3];
+			out = 0;
+
+			GameLogics.pitch(ball);
 			
-			if (result == 1) {
-				System.out.println("사용자 승");
-				break;
-			} else if (result == -1) {
-				++out;
-				System.out.printf("OUT: %d\n", out);
+			while (true) {
+				System.out.print("[0-9]까지 숫자 3개를 입력하시오: ");
+				for (int i = 0; i < 3; i++) {
+					bat[i] = in.nextInt();
+				}
+				result = GameLogics.compare(ball, bat);
 				
-				if (out == 3) {
-					System.out.println("컴퓨터 승");
+				if (result == 1) {
+					System.out.println("사용자 승");
 					break;
+				} else if (result == -1) {
+					++out;
+					System.out.printf("OUT: %d\n", out);
+					
+					if (out == 3) {
+						System.out.println("컴퓨터 승");
+						break;
+					}
 				}
 			}
 		}
-	}
-	
-	private boolean done() {
-		System.out.println("새로운 게임을 플레이하시겠습니까? (Y/N)");
-		String s = in.next();
-		
-		return Pattern.matches(noExpr, s);
+
+		// 사용자 입력에 대한 예외를 처리하기 위한 예외 선언.
+		private static boolean done() throws Exception {
+			System.out.println("새로운 게임을 플레이하시겠습니까? (Y/N)");
+			String s = in.next();
+			
+			if (Pattern.matches(noExpr, s))
+				return true;
+			else if (Pattern.matches(yesExpr, s))
+				return false;
+			else
+				throw new Exception("유효하지 않은 입력 예외: 유효하지 않은 사용자 입력입니다.");
+		}
 	}
 	
 	private class GameLogics {
