@@ -8,9 +8,9 @@ import java.util.regex.Pattern;			// 사용자 입력에서 Y/N을 구분하기 
 // 사용자가 실제로 사용할 사용자와 play 함수를 제외한 모든 멤버 변수, 함수, 클래스들을 private으로 선언.
 public class Baseball {
 	// Scanner와 N에 대한 정규식 표현은 변할 일이 없으므로 final로 선언.
-	private static final Scanner in = new Scanner(System.in);
-	private static final String noExpr = "([Nn][Oo]|[Nn])";
-	private static final String yesExpr = "([Yy][Ee][Ss]|[Yy])";
+	private static final Scanner IN = new Scanner(System.in);
+	private static final String NO_EXPR = "([Nn][Oo]|[Nn])";
+	private static final String YES_EXPR = "([Yy][Ee][Ss]|[Yy])";
 	
 	private static int[] bat;
 	private static int[] ball;
@@ -35,7 +35,7 @@ public class Baseball {
 			while (true) {
 				System.out.print("[0-9]까지 숫자 3개를 입력하시오: ");
 				for (int i = 0; i < 3; i++) {
-					bat[i] = in.nextInt();
+					bat[i] = IN.nextInt();
 				}
 				result = GameLogics.compare(ball, bat);
 				
@@ -57,11 +57,11 @@ public class Baseball {
 		// 사용자 입력에 대한 예외를 처리하기 위한 예외 선언.
 		private static boolean done() throws Exception {
 			System.out.println("새로운 게임을 플레이하시겠습니까? (Y/N)");
-			String s = in.next();
+			String s = IN.next();
 			
-			if (Pattern.matches(noExpr, s))
+			if (Pattern.matches(NO_EXPR, s))
 				return true;
-			else if (Pattern.matches(yesExpr, s))
+			else if (Pattern.matches(YES_EXPR, s))
 				return false;
 			else
 				throw new Exception("유효하지 않은 입력 예외: 유효하지 않은 사용자 입력입니다.");
