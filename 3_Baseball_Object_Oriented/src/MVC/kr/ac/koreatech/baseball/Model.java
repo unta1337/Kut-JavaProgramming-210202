@@ -5,7 +5,7 @@
 // 과제명: 객체지향 패턴으로 숫자 야구 게임 작성하기
 // 저자: 2020136018 김성녕
 
-package kr.ac.koreatech.baseball;
+package mvc.kr.ac.koreatech.baseball;
 
 public class Model {
 	// 플레이어의 결과를 연산하기 위한 열거형.

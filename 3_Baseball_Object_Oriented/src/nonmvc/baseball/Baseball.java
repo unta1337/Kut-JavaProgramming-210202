@@ -1,6 +1,6 @@
 // 2020136018 김성녕
 
-package BaseballGame;
+package nonmvc.baseball;
 
 import java.util.Scanner;
 import java.util.regex.Pattern;			// 사용자 입력에서 Y/N을 구분하기 위해 정규식 사용.

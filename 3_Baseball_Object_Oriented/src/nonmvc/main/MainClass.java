@@ -1,8 +1,8 @@
 // 2020136018 김성녕
 
-package MainPackage;
+package nonmvc.main;
 
-import BaseballGame.Baseball;
+import nonmvc.baseball.Baseball;
 
 public class MainClass {
 	// 사용자 입력에 대한 예외를 처리하기 위한 예외 선언.
