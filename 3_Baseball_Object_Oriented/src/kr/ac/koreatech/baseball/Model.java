@@ -1,6 +1,14 @@
+// 기관명: 한국기술교육대학교
+// 학년도: 2021 학년도
+// 교과목: 자바프로그래밍
+// 주차: 3 주차
+// 과제명: 객체지향 패턴으로 숫자 야구 게임 작성하기
+// 저자: 2020136018 김성녕
+
 package kr.ac.koreatech.baseball;
 
 public class Model {
+	// 플레이어의 결과를 연산하기 위한 열거형.
 	enum PlayerStatus {
 		WIN,
 		LOSE,
@@ -52,6 +60,7 @@ public class Model {
 	}
 
 	// 게임 로직.
+	// 최초 게임 설정 수행.
 	void initBalls() {
 		int[] flags = new int[10];
 		

@@ -1,3 +1,10 @@
+// 기관명: 한국기술교육대학교
+// 학년도: 2021 학년도
+// 교과목: 자바프로그래밍
+// 주차: 3 주차
+// 과제명: 객체지향 패턴으로 숫자 야구 게임 작성하기
+// 저자: 2020136018 김성녕
+
 package kr.ac.koreatech.baseball;
 
 import java.util.Scanner;
@@ -8,7 +15,6 @@ public class View {
 	
 	private static final String NO_EXPR = "([Nn][Oo]|[Nn])";
 	private static final String YES_EXPR = "([Yy][Ee][Ss]|[Yy])";
-	
 	
 	// 순수 입력.
 	String getStringInput() {
