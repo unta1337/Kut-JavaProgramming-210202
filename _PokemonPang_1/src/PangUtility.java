@@ -1,3 +1,10 @@
+// 기관명: 한국기술교육대학교
+// 학년도: 2021 학년도
+// 교과목: 자바프로그래밍
+// 주차: 학기 과제 1
+// 과제명: 포켓몬팡: 최초 그리드 팡 제거.
+// 저자: 2020136018 김성녕
+
 import java.util.Optional;
 
 import javafx.scene.control.Alert;

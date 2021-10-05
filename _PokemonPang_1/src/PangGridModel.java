@@ -1,3 +1,10 @@
+// 기관명: 한국기술교육대학교
+// 학년도: 2021 학년도
+// 교과목: 자바프로그래밍
+// 주차: 학기 과제 1
+// 과제명: 포켓몬팡: 최초 그리드 팡 제거.
+// 저자: 2020136018 김성녕
+
 import java.util.Arrays;
 
 /**
@@ -20,26 +27,10 @@ public class PangGridModel {
 	}
 
 	public void initAssign(){
-		//randomAssign();
-		debugAssign();
-
-		int[] temp = pangCheckColDir();
-		if (temp != null) {
-			for (int i = 0; i < 4; i++) {
-				System.out.print(temp[i] + " ");
-			}
-			System.out.println();
-		}
-
-		System.out.println();
-
-		temp = pangCheckRowDir();
-		if (temp != null) {
-			for (int i = 0; i < 4; i++) {
-				System.out.print(temp[i] + " ");
-			}
-			System.out.println();
-		}
+		// 팡이 발생하지 않을 때까지 랜덤 배정.
+		do {
+			randomAssign();
+		} while (pangCheck() != null);
 
 		view.update(gridData);
 	}
@@ -69,9 +60,9 @@ public class PangGridModel {
 				gridData[r][c] = Pokemon.values()[list[r][c]];
 			}
 		}
-		
 	}
 	
+	// 그리드의 특정 행을 돌며 3개 이상 나타나는 팡 체크.
 	private int[] pangCheckColDirWithRow(int row) {
 		Pokemon target = gridData[row][0];
 
@@ -102,6 +93,7 @@ public class PangGridModel {
 		return null;
 	}
 	
+	// 그리드의 각 행을 돌여 팡 체크.
 	private int[] pangCheckColDir() {
 		for (int r = 0; r < gridData.length; r++) {
 			int[] temp = pangCheckColDirWithRow(r);
@@ -113,6 +105,7 @@ public class PangGridModel {
 		return null;
 	}
 
+	// 그리드의 특정 열을 돌며 3개 이상 나타나는 팡 체크.
 	private int[] pangCheckRowDirWithCol(int col) {
 		Pokemon target = gridData[0][col];
 
@@ -122,7 +115,7 @@ public class PangGridModel {
 		int count = 1;
 		int prevCount = -1;
 
-		for (int r = 1; r < gridData[r].length; r++) {
+		for (int r = 1; r < gridData.length; r++) {
 			if (gridData[r][col] == target) {
 				count++;
 			} else {
@@ -136,13 +129,14 @@ public class PangGridModel {
 			
 			if (prevCount >= 3)
 				return new int[] { prevStart, col, prevStart + prevCount - 1, col };
-			else if (r == (gridData[r].length - 1) && count >= 3)
+			else if (r == (gridData.length - 1) && count >= 3)
 				return new int[] { start, col, start + count - 1, col };
 		}
 
 		return null;
 	}
 	
+	// 그리드의 각 열을 돌여 팡 체크.
 	private int[] pangCheckRowDir() {
 		for (int c = 0; c < gridData[0].length; c++) {
 			int[] temp = pangCheckRowDirWithCol(c);
@@ -154,6 +148,8 @@ public class PangGridModel {
 		return null;
 	}
 	
+	// 그리드의 행과 열에 대해서 팡 체크.
+	// 이 메소드는 추후 재귀를 이용해 십자 형태로 나타나는 팡을 감지할 수 있음.
 	private int[] pangCheck() {
 		int[] row = pangCheckColDir();
 		if (row != null)
