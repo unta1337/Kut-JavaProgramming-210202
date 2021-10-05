@@ -15,6 +15,8 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class DrawMoodyFaceDueToTheAssignments extends Application {
 	public static class MoodyFace extends Group {
@@ -52,8 +54,15 @@ public class DrawMoodyFaceDueToTheAssignments extends Application {
 		MoodyFace face1 = new MoodyFace(250d, 50d);
 		MoodyFace face2 = new MoodyFace(50d, 250d);
 
+		Image pepe = new Image("pepe.jpg");
+		ImageView viewPepe = new ImageView(pepe);
+		viewPepe.setFitWidth(120d);
+		viewPepe.setPreserveRatio(true);
+		viewPepe.setTranslateX(350d);
+		viewPepe.setTranslateY(350d);
+
 		Pane pane = new Pane();
-		pane.getChildren().addAll(face1, face2);
+		pane.getChildren().addAll(face1, face2, viewPepe);
 		
 		mainStage.setTitle("Moody Face");
 		mainStage.setScene(new Scene(pane, 500d, 500d));
