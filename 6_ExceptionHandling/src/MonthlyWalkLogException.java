@@ -22,3 +22,10 @@ class MoonWalkException extends MonthlyWalkLogException {
 		super(String.format("유효하지 않은 거리 | 예상: 양수 | 실제: %f", distance));
 	}
 }
+
+class SuperManException extends MonthlyWalkLogException {
+	SuperManException(double max, double distance) {
+		super(String.format("당신은 슈퍼맨입니까? 사람은 하루에 %fkm 이상 걸을 수 없습니다. 그런데 당신은 %fkm를 걸으셨으니, 사실은 초인일지도요...", max, distance));
+		// ref: https://www.guinnessworldrecords.com/world-records/64741-farthest-distance-walking-in-24-hours-male
+	}
+}

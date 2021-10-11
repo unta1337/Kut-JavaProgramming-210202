@@ -16,6 +16,7 @@ import java.time.LocalDate;
  */
 public class MonthlyWalkLog {
 	private double[] dailyDistance = null;
+	private final double maxDistance = 228.93;
 	public final int year;
 	public final int month;
 	public final int days;
@@ -40,6 +41,8 @@ public class MonthlyWalkLog {
 			throw new NotTodayException(day, days);
 		if (distance < 0)
 			throw new MoonWalkException(distance);
+		if (distance > maxDistance)
+			throw new SuperManException(maxDistance, distance);
 
 		dailyDistance[day-1] = distance;
 	}

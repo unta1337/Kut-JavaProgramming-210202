@@ -15,7 +15,7 @@
 public class MonthlyWalkLogTest {
 	public static void main(String[] args) throws MonthlyWalkLogException {
 		MonthlyWalkLog log = new MonthlyWalkLog();
-		log.recordDistance(12, -5.5);
+		log.recordDistance(12, 228.931);
 		log.print();
 	}
 }
