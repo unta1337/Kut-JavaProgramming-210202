@@ -28,11 +28,24 @@ public class MonthlyWalkLog {
 		this.days = logDate.lengthOfMonth();
 		dailyDistance = new double[days];
 	}
-	public MonthlyWalkLog(int year, int month) {
-		LocalDate today = LocalDate.now();
+	public MonthlyWalkLog(int year, int month) throws MonthlyWalkLogException {
+		if (year <= 0)
+			throw new BeforeChristianException(year);
+		if (!(1 <= month && month <= 12))
+			throw new UndecemberException(month);
+
+		if (year >= 3000)
+			throw new FuturamaException();
+
+		// 예외 처리에 사용된 변수이므로 필요하지 않음.
+		//LocalDate today = LocalDate.now();
+
 		logDate = LocalDate.of(year, month, 1);
-		this.year = (year>=2000)? year: today.getYear();
-		this.month = (month>=1&&month<=12)? month: today.getMonthValue();
+
+		// 도입부에서 예외 처리를 시행하였으므로 삼항 연산자가 필요하지 않음.
+		this.year = year;
+		this.month = month;
+
 		this.days = logDate.lengthOfMonth();
 		dailyDistance = new double[days];
 	} 
@@ -42,8 +55,6 @@ public class MonthlyWalkLog {
 		if (distance < 0)
 			throw new MoonWalkException(distance);
 
-		if (year >= 3000)
-			throw new FuturamaException();
 		if (distance > maxDistance)
 			throw new SuperManException(maxDistance, distance);
 

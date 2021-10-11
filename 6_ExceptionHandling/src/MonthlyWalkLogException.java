@@ -17,22 +17,35 @@ class NotTodayException extends MonthlyWalkLogException {
 	}
 }
 
+// ref: https://namu.wiki/w/13%EC%9B%94
+class UndecemberException extends MonthlyWalkLogException {
+	UndecemberException(int month) {
+		super(String.format("유효하지 않은 달 | 예상: 1-12 사이의 값 | 실제: %d", month));
+	}
+}
+
+class BeforeChristianException extends MonthlyWalkLogException {
+	BeforeChristianException(int year) {
+		super(String.format("유효하지 않은 연도 | 예상: 0을 포함하지 않는 자연수 | 실제: 기원전 %d년", -year));
+	}
+}
+
 class MoonWalkException extends MonthlyWalkLogException {
 	MoonWalkException(double distance) {
 		super(String.format("유효하지 않은 거리 | 예상: 양수 | 실제: %f", distance));
 	}
 }
 
+// ref: https://www.guinnessworldrecords.com/world-records/64741-farthest-distance-walking-in-24-hours-male
 class SuperManException extends MonthlyWalkLogException {
 	SuperManException(double max, double distance) {
 		super(String.format("당신은 슈퍼맨입니까? 사람은 하루에 %fkm 이상 걸을 수 없습니다. 그런데 당신은 %fkm를 걸으셨으니, 사실은 초인일지도요...", max, distance));
-		// ref: https://www.guinnessworldrecords.com/world-records/64741-farthest-distance-walking-in-24-hours-male
 	}
 }
 
+// ref: https://namu.wiki/w/2038%EB%85%84%20%EB%AC%B8%EC%A0%9C
 class FuturamaException extends MonthlyWalkLogException {
 	FuturamaException() {
 		super("미래에서 오신 분이군요! 2038년 문제는 해결되었나요?");
-		// ref: https://namu.wiki/w/2038%EB%85%84%20%EB%AC%B8%EC%A0%9C
 	}
 }
