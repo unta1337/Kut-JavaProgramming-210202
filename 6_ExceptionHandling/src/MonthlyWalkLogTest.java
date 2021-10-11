@@ -13,12 +13,9 @@
  * 월별 걸음 거리 기록 테스트 프로그램
  */
 public class MonthlyWalkLogTest {
-
-	public static void main(String[] args) {
+	public static void main(String[] args) throws MonthlyWalkLogException {
 		MonthlyWalkLog log = new MonthlyWalkLog();
-		log.recordDistance(3, 5.5);
+		log.recordDistance(12, -5.5);
 		log.print();
-
 	}
-
 }

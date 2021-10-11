@@ -18,24 +18,35 @@ public class MonthlyWalkLog {
 	private double[] dailyDistance = null;
 	public final int year;
 	public final int month;
+	public final int days;
 	private LocalDate logDate;
 	public MonthlyWalkLog() {
 		logDate =  LocalDate.now();
 		this.year = logDate.getYear();
 		this.month = logDate.getMonthValue();
-		dailyDistance = new double[logDate.lengthOfMonth()];
+		this.days = logDate.lengthOfMonth();
+		dailyDistance = new double[days];
 	}
 	public MonthlyWalkLog(int year, int month) {
 		LocalDate today = LocalDate.now();
+		logDate = LocalDate.of(year, month, 1);
 		this.year = (year>=2000)? year: today.getYear();
 		this.month = (month>=1&&month<=12)? month: today.getMonthValue();
-		logDate = LocalDate.of(year, month, 1);
-		dailyDistance = new double[logDate.lengthOfMonth()];
+		this.days = logDate.lengthOfMonth();
+		dailyDistance = new double[days];
 	} 
-	public void recordDistance(int day, double distance) {
+	public void recordDistance(int day, double distance) throws MonthlyWalkLogException {
+		if (!(1 <= day && day <= days))
+			throw new NotTodayException(day, days);
+		if (distance < 0)
+			throw new MoonWalkException(distance);
+
 		dailyDistance[day-1] = distance;
 	}
-	public double getDistance(int day) {
+	public double getDistance(int day) throws MonthlyWalkLogException {
+		if (!(1 <= day && day <= days))
+			throw new NotTodayException(day, days);
+
 		return dailyDistance[day-1];
 	}
 	public void print() {
