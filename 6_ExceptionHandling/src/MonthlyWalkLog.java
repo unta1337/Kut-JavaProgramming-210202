@@ -10,7 +10,7 @@ import java.time.LocalDate;
 /**
  * @copyright 한국기술교육대학교 컴퓨터공학부 자바프로그래밍
  * @version 2021년도 2학기
- * @author 김상진  
+ * @author 김상진, 김성녕
  * @file MonthlyWalkLog
  * 월별 걸음 거리 기록
  */
@@ -41,6 +41,9 @@ public class MonthlyWalkLog {
 			throw new NotTodayException(day, days);
 		if (distance < 0)
 			throw new MoonWalkException(distance);
+
+		if (year >= 3000)
+			throw new FuturamaException();
 		if (distance > maxDistance)
 			throw new SuperManException(maxDistance, distance);
 

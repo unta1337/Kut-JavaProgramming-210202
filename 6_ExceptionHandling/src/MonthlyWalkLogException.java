@@ -29,3 +29,10 @@ class SuperManException extends MonthlyWalkLogException {
 		// ref: https://www.guinnessworldrecords.com/world-records/64741-farthest-distance-walking-in-24-hours-male
 	}
 }
+
+class FuturamaException extends MonthlyWalkLogException {
+	FuturamaException() {
+		super("미래에서 오신 분이군요! 2038년 문제는 해결되었나요?");
+		// ref: https://namu.wiki/w/2038%EB%85%84%20%EB%AC%B8%EC%A0%9C
+	}
+}
