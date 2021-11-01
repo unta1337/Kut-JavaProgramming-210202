@@ -5,6 +5,8 @@
 // 과제명: 포켓몬팡: 최초 그리드 팡 제거.
 // 저자: 2020136018 김성녕
 
+import java.util.ArrayList;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -86,7 +88,29 @@ public class PangGridView extends BorderPane {
 		srcBorder.setLayoutY(loc.r()*PangUtility.POKETMONIMAGESIZE);
 		pangGrid.getChildren().add(srcBorder);
 	}
+
+	public Rectangle getHintBorder(Location loc, Color color) {
+        Rectangle hintBorder = new Rectangle(0, 0, PangUtility.POKETMONIMAGESIZE, PangUtility.POKETMONIMAGESIZE);
+
+        hintBorder.setStroke(color);
+        hintBorder.setStrokeWidth(1);
+        hintBorder.setFill(null);
+
+        hintBorder.setLayoutX(loc.c() * PangUtility.POKETMONIMAGESIZE);
+        hintBorder.setLayoutY(loc.r() * PangUtility.POKETMONIMAGESIZE);
+
+        pangGrid.getChildren().add(hintBorder);
+
+        return hintBorder;
+    }
 	
+	// 힌트 경계 표시.
+    public void showHintEffect(ArrayList<int[]> hints){
+    	for (int[] hint : hints) {
+			getHintBorder(new Location(hint[0], hint[1]), Color.BLACK);
+    	}
+    }
+
 	public void removeEffect() {
 		pangGrid.getChildren().remove(srcBorder);
 	}

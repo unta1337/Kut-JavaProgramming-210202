@@ -7,6 +7,7 @@
 
 import java.util.Arrays;
 import java.util.ArrayList;
+import javafx.scene.paint.Color;
 
 /**
  * 한국기술교육대학교 컴퓨터공학부
@@ -33,9 +34,8 @@ public class PangGridModel {
 			randomAssign();
 		} while (pangCheck() != null);
 		
-		findHints();
-		
 		view.update(gridData);
+		view.showHintEffect(findHints());
 	}
 	/**
 	 * 7개 포켓몬들을 임의로 배치 
@@ -214,15 +214,24 @@ public class PangGridModel {
 		return hints;
 	}
 	
+	@SuppressWarnings("unused")
 	private ArrayList<int[]> findHintColDir2InARow() {
 		ArrayList<int[]> hints = new ArrayList<int[]>();
 
 		for (int i = 0; i < gridData.length; i++) {
 			for (int j = 0; j < gridData[i].length - 1; j++) {
-				ArrayList<int[]> subHint = findHintColDir2InARowWithLocation(new int[] { i, j, i, j + 1 });
+				Pokemon left = gridData[i][j];
+				Pokemon right = gridData[i][j + 1];
+
+				ArrayList<int[]> subHint = null;
+
+				if (left == right)
+					subHint = findHintColDir2InARowWithLocation(new int[] { i, j, i, j + 1 });
 				
-				for (int[] e : subHint) {
-					hints.add(e);
+				if (subHint != null) {
+					for (int[] e : subHint) {
+						hints.add(e);
+					}
 				}
 			}
 		}
@@ -280,10 +289,18 @@ public class PangGridModel {
 
 		for (int i = 0; i < gridData.length - 1; i++) {
 			for (int j = 0; j < gridData[i].length; j++) {
-				ArrayList<int[]> subHint = findHintRowDir2InARowWithLocation(new int[] { i, j, i + 1, j });
+				Pokemon left = gridData[i][j];
+				Pokemon right = gridData[i + 1][j];
+
+				ArrayList<int[]> subHint = null;
+
+				if (left == right)
+					subHint = findHintRowDir2InARowWithLocation(new int[] { i, j, i + 1, j });
 				
-				for (int[] e : subHint) {
-					hints.add(e);
+				if (subHint != null) {
+					for (int[] e : subHint) {
+						hints.add(e);
+					}
 				}
 			}
 		}
@@ -376,12 +393,12 @@ public class PangGridModel {
 	
 	private ArrayList<int[]> findHints() {
 		ArrayList<int[]> hints = findHintWithStep();
-		ArrayList<int[]> temp = findHint2InARow();
+		ArrayList<int[]> temp = findHintRowDir2InARow();
 		for (int[] e : temp) {
 			hints.add(new int[] { e[0], e[1] });
 		}
 
-		for (int[] e : temp) {
+		for (int[] e : hints) {
 			System.out.printf("%d %d\n", e[0], e[1]);
 		}
 		
