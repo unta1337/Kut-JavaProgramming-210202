@@ -169,7 +169,8 @@ public class PangGridModel {
 		return pangCheck(3);
 	}
 	
-	private int[][] findHintColDir(int[] location) {
+	// 열방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
+	private int[][] findHintColDir2InARow(int[] location) {
 		Pokemon target = gridData[location[0]][location[1]];
 		int[][] candidates = new int[6][3];			// { row, col, isHint }
 
@@ -212,7 +213,8 @@ public class PangGridModel {
 		return candidates;
 	}
 	
-	private int[][] findHintRowDir(int[] location) {
+	// 행방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
+	private int[][] findHintRowDir2InARow(int[] location) {
 		Pokemon target = gridData[location[0]][location[1]];
 		int[][] candidates = new int[6][3];			// { row, col, isHint }
 
@@ -255,23 +257,17 @@ public class PangGridModel {
 		return candidates;
 	}
 	
+	// 열방향 징검다리 힌트 찾기.
+	private int[][] findHintColDirWithStep(int[] location) {
+		return null;
+	}
+	
+	
+	// 행방향 징검다리 힌트 찾기.
+	private int[][] findHintRowDirWithStep(int[] location) {
+		return null;
+	}
+	
 	private void findHints() {
-		ArrayList<int[][]> candidates = new ArrayList<int[][]>();
-		
-		int[] temp = pangCheckRowDir(2);
-		if (temp != null) {
-			System.out.printf("%d %d\n", temp[0], temp[1]);
-		}
-		
-		int[][] temp2 = null;
-		if (temp != null) {
-			temp2 = findHintRowDir(new int[] {temp[0], temp[1], temp[2], temp[3] });
-			for (int[] e : temp2) {
-				if (e[2] == 1)
-					System.out.printf("%d %d\n", e[0], e[1]);
-			}
-		}
-		
-		//candidates.add(findHintRowDir(new int[] { temp[0], temp[1] }));
 	}
 }
