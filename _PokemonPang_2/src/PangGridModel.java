@@ -170,10 +170,10 @@ public class PangGridModel {
 	}
 	
 	// 열방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
-	private int[] findHintColDir2InARow(int[] location) {
+	private ArrayList<int[]> findHintColDir2InARowWithLocation(int[] location) {
 		Pokemon target = gridData[location[0]][location[1]];
 		int[][] candidates = new int[6][3];			// { row, col, isHint }
-		int[] hint = null;
+		ArrayList<int[]> hints = new ArrayList<int[]>();
 
 		int index = 0;
 		for (int i = -1; i <= 1; i++) {
@@ -207,20 +207,34 @@ public class PangGridModel {
 				continue;
 			}
 			
-			if (gridData[row][col] == target) {
-				hint = new int[] { row, col };
-				break;
+			if (gridData[row][col] == target)
+				hints.add(new int[] { row, col });
+		}
+
+		return hints;
+	}
+	
+	private ArrayList<int[]> findHintColDir2InARow() {
+		ArrayList<int[]> hints = new ArrayList<int[]>();
+
+		for (int i = 0; i < gridData.length; i++) {
+			for (int j = 0; j < gridData[i].length - 1; j++) {
+				ArrayList<int[]> subHint = findHintColDir2InARowWithLocation(new int[] { i, j, i, j + 1 });
+				
+				for (int[] e : subHint) {
+					hints.add(e);
+				}
 			}
 		}
 
-		return hint;
+		return hints;
 	}
 	
 	// 행방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
-	private int[] findHintRowDir2InARow(int[] location) {
+	private ArrayList<int[]> findHintRowDir2InARowWithLocation(int[] location) {
 		Pokemon target = gridData[location[0]][location[1]];
 		int[][] candidates = new int[6][3];			// { row, col, isHint }
-		int[] hint = null;
+		ArrayList<int[]> hints = new ArrayList<int[]>();
 
 		int index = 0;
 		for (int i = -1; i <= 1; i++) {
@@ -254,13 +268,37 @@ public class PangGridModel {
 				continue;
 			}
 			
-			if (gridData[row][col] == target) {
-				hint = new int[] { row, col };
-				break;
+			if (gridData[row][col] == target)
+				hints.add(new int[] { row, col });
+		}
+
+		return hints;
+	}
+
+	private ArrayList<int[]> findHintRowDir2InARow() {
+		ArrayList<int[]> hints = new ArrayList<int[]>();
+
+		for (int i = 0; i < gridData.length - 1; i++) {
+			for (int j = 0; j < gridData[i].length; j++) {
+				ArrayList<int[]> subHint = findHintRowDir2InARowWithLocation(new int[] { i, j, i + 1, j });
+				
+				for (int[] e : subHint) {
+					hints.add(e);
+				}
 			}
 		}
 
-		return hint;
+		return hints;
+	}
+	
+	private ArrayList<int[]> findHint2InARow() {
+		ArrayList<int[]> hints = findHintRowDir2InARow();
+		ArrayList<int[]> temp = findHintColDir2InARow();
+		for (int[] e : temp) {
+			hints.add(new int[] { e[0], e[1] });
+		}
+		
+		return hints;
 	}
 	
 	// 열방향 징검다리 힌트 찾기.
@@ -336,11 +374,17 @@ public class PangGridModel {
 		return hints;
 	}
 	
-	private void findHints() {
+	private ArrayList<int[]> findHints() {
 		ArrayList<int[]> hints = findHintWithStep();
+		ArrayList<int[]> temp = findHint2InARow();
+		for (int[] e : temp) {
+			hints.add(new int[] { e[0], e[1] });
+		}
 
-		for (int[] e : hints) {
+		for (int[] e : temp) {
 			System.out.printf("%d %d\n", e[0], e[1]);
 		}
+		
+		return hints;
 	}
 }
