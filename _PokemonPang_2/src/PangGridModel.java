@@ -6,6 +6,7 @@
 // 저자: 2020136018 김성녕
 
 import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * 한국기술교육대학교 컴퓨터공학부
@@ -31,7 +32,9 @@ public class PangGridModel {
 		do {
 			randomAssign();
 		} while (pangCheck() != null);
-
+		
+		findHints();
+		
 		view.update(gridData);
 	}
 	/**
@@ -62,8 +65,8 @@ public class PangGridModel {
 		}
 	}
 	
-	// 그리드의 특정 행을 돌며 3개 이상 나타나는 팡 체크.
-	private int[] pangCheckColDirWithRow(int row) {
+	// 그리드의 특정 행을 돌며 pangCount개 이상 나타나는 팡 체크.
+	private int[] pangCheckColDirWithRow(int row, int pangCount) {
 		Pokemon target = gridData[row][0];
 
 		int start = 0;
@@ -84,9 +87,9 @@ public class PangGridModel {
 				target = gridData[row][c];
 			}
 			
-			if (prevCount >= 3)
+			if (prevCount >= pangCount)
 				return new int[] { row, prevStart, row, prevStart + prevCount - 1 };
-			else if (c == (gridData[row].length - 1) && count >= 3)
+			else if (c == (gridData[row].length - 1) && count >= pangCount)
 				return new int[] { row, start, row, start + count - 1 };
 		}
 
@@ -94,9 +97,9 @@ public class PangGridModel {
 	}
 	
 	// 그리드의 각 행을 돌여 팡 체크.
-	private int[] pangCheckColDir() {
+	private int[] pangCheckColDir(int pangCount) {
 		for (int r = 0; r < gridData.length; r++) {
-			int[] temp = pangCheckColDirWithRow(r);
+			int[] temp = pangCheckColDirWithRow(r, pangCount);
 
 			if (temp != null)
 				return temp;
@@ -105,8 +108,8 @@ public class PangGridModel {
 		return null;
 	}
 
-	// 그리드의 특정 열을 돌며 3개 이상 나타나는 팡 체크.
-	private int[] pangCheckRowDirWithCol(int col) {
+	// 그리드의 특정 열을 돌며 pangCount개 이상 나타나는 팡 체크.
+	private int[] pangCheckRowDirWithCol(int col, int pangCount) {
 		Pokemon target = gridData[0][col];
 
 		int start = 0;
@@ -127,9 +130,9 @@ public class PangGridModel {
 				target = gridData[r][col];
 			}
 			
-			if (prevCount >= 3)
+			if (prevCount >= pangCount)
 				return new int[] { prevStart, col, prevStart + prevCount - 1, col };
-			else if (r == (gridData.length - 1) && count >= 3)
+			else if (r == (gridData.length - 1) && count >= pangCount)
 				return new int[] { start, col, start + count - 1, col };
 		}
 
@@ -137,9 +140,9 @@ public class PangGridModel {
 	}
 	
 	// 그리드의 각 열을 돌여 팡 체크.
-	private int[] pangCheckRowDir() {
+	private int[] pangCheckRowDir(int pangCount) {
 		for (int c = 0; c < gridData[0].length; c++) {
-			int[] temp = pangCheckRowDirWithCol(c);
+			int[] temp = pangCheckRowDirWithCol(c, pangCount);
 
 			if (temp != null)
 				return temp;
@@ -150,15 +153,125 @@ public class PangGridModel {
 	
 	// 그리드의 행과 열에 대해서 팡 체크.
 	// 이 메소드는 추후 재귀를 이용해 십자 형태로 나타나는 팡을 감지할 수 있음.
-	private int[] pangCheck() {
-		int[] row = pangCheckColDir();
+	private int[] pangCheck(int pangCount) {
+		int[] row = pangCheckColDir(pangCount);
 		if (row != null)
 			return row;
 
-		int[] col = pangCheckRowDir();
+		int[] col = pangCheckRowDir(pangCount);
 		if (col != null)
 			return col;
 		
 		return null;
+	}
+
+	private int[] pangCheck() {
+		return pangCheck(3);
+	}
+	
+	private int[][] findHintColDir(int[] location) {
+		Pokemon target = gridData[location[0]][location[1]];
+		int[][] candidates = new int[6][3];			// { row, col, isHint }
+
+		int index = 0;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				// 꼭짓점, 자기 자신, 및 다음 항목 건너 뛰기.
+				if (Math.abs(i + j) != 1 || j == 1)
+					continue;
+				
+				candidates[index][0] = location[0] + i;
+				candidates[index++][1] = location[1] + j - 1;
+			}
+		}
+
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				// 꼭짓점, 자기 자신, 및 이전 항목 건너 뛰기.
+				if (Math.abs(i + j) != 1 || j == -1)
+					continue;
+				
+				candidates[index][0] = location[2] + i;
+				candidates[index++][1] = location[3] + j + 1;
+			}
+		}
+		
+		for (int i = 0; i < 6; i++) {
+			int row = candidates[i][0];
+			int col = candidates[i][1];
+
+			// 좌표 유효성 검사.
+			if (!(0 <= row && row < gridData.length) || !(0 <= col && col < gridData[i].length)) {
+				continue;
+			}
+			
+			if (gridData[row][col] == target)
+				candidates[i][2] = 1;
+		}
+
+		return candidates;
+	}
+	
+	private int[][] findHintRowDir(int[] location) {
+		Pokemon target = gridData[location[0]][location[1]];
+		int[][] candidates = new int[6][3];			// { row, col, isHint }
+
+		int index = 0;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				// 꼭짓점, 자기 자신, 및 다음 항목 건너 뛰기.
+				if (Math.abs(i + j) != 1 || i == 1)
+					continue;
+				
+				candidates[index][0] = location[0] + i - 1;
+				candidates[index++][1] = location[1] + j;
+			}
+		}
+
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				// 꼭짓점, 자기 자신, 및 이전 항목 건너 뛰기.
+				if (Math.abs(i + j) != 1 || i == -1)
+					continue;
+				
+				candidates[index][0] = location[2] + i + 1;
+				candidates[index++][1] = location[3] + j;
+			}
+		}
+		
+		for (int i = 0; i < 6; i++) {
+			int row = candidates[i][0];
+			int col = candidates[i][1];
+
+			// 좌표 유효성 검사.
+			if (!(0 <= row && row < gridData.length) || !(0 <= col && col < gridData[i].length)) {
+				continue;
+			}
+			
+			if (gridData[row][col] == target)
+				candidates[i][2] = 1;
+		}
+
+		return candidates;
+	}
+	
+	private void findHints() {
+		ArrayList<int[][]> candidates = new ArrayList<int[][]>();
+		
+		int[] temp = pangCheckRowDir(2);
+		if (temp != null) {
+			System.out.printf("%d %d\n", temp[0], temp[1]);
+		}
+		
+		int[][] temp2 = null;
+		if (temp != null) {
+			temp2 = findHintRowDir(new int[] {temp[0], temp[1], temp[2], temp[3] });
+			for (int[] e : temp2) {
+				if (e[2] == 1)
+					System.out.printf("%d %d\n", e[0], e[1]);
+			}
+		}
+		
+		//candidates.add(findHintRowDir(new int[] { temp[0], temp[1] }));
 	}
 }
