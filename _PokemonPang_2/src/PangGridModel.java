@@ -258,16 +258,72 @@ public class PangGridModel {
 	}
 	
 	// 열방향 징검다리 힌트 찾기.
-	private int[][] findHintColDirWithStep(int[] location) {
-		return null;
+	private int[] findHintColDirWithStep() {
+		int hint[] = null;
+		
+		for (int i = 0; i < gridData.length; i++) {
+			for (int j = 0; j < gridData[i].length - 2; j++) {
+				Pokemon left = gridData[i][j];
+				Pokemon right = gridData[i][j + 2];
+				
+				if (left != right)
+					continue;
+				
+				Pokemon middle1 = null;
+				Pokemon middle2 = null;
+				
+				if (i != 0)
+					middle1 = gridData[i - 1][j + 1];
+				if (i != gridData.length - 1)
+					middle2 = gridData[i + 1][j + 1];
+				
+				if (left == middle1)
+					hint = new int[] { i - 1, j + 1 };
+				else if (left == middle2)
+					hint = new int[] { i + 1, j + 1 };
+
+			}
+		}
+
+		return hint;
 	}
 	
 	
 	// 행방향 징검다리 힌트 찾기.
-	private int[][] findHintRowDirWithStep(int[] location) {
-		return null;
+	private int[] findHintRowDirWithStep() {
+		int hint[] = null;
+		
+		for (int i = 0; i < gridData.length - 2; i++) {
+			for (int j = 0; j < gridData[i].length; j++) {
+				Pokemon left = gridData[i][j];
+				Pokemon right = gridData[i + 2][j];
+
+				if (left != right)
+					continue;
+				
+				Pokemon middle1 = null;
+				Pokemon middle2 = null;
+				
+				if (j != 0)
+					middle1 = gridData[i + 1][j - 1];
+				if (j != gridData[i].length - 1)
+					middle2 = gridData[i + 1][j + 1];
+				
+				if (left == middle1)
+					hint = new int[] { i + 1, j - 1 };
+				else if (left == middle2)
+					hint = new int[] { i + 1, j + 1 };
+
+			}
+		}
+
+		return hint;
 	}
 	
 	private void findHints() {
+		int[] hint = findHintRowDirWithStep();
+		
+		if (hint != null)
+			System.out.printf("%d %d\n", hint[0], hint[1]);
 	}
 }
