@@ -170,9 +170,10 @@ public class PangGridModel {
 	}
 	
 	// 열방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
-	private int[][] findHintColDir2InARow(int[] location) {
+	private int[] findHintColDir2InARow(int[] location) {
 		Pokemon target = gridData[location[0]][location[1]];
 		int[][] candidates = new int[6][3];			// { row, col, isHint }
+		int[] hint = null;
 
 		int index = 0;
 		for (int i = -1; i <= 1; i++) {
@@ -206,17 +207,20 @@ public class PangGridModel {
 				continue;
 			}
 			
-			if (gridData[row][col] == target)
-				candidates[i][2] = 1;
+			if (gridData[row][col] == target) {
+				hint = new int[] { row, col };
+				break;
+			}
 		}
 
-		return candidates;
+		return hint;
 	}
 	
 	// 행방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
-	private int[][] findHintRowDir2InARow(int[] location) {
+	private int[] findHintRowDir2InARow(int[] location) {
 		Pokemon target = gridData[location[0]][location[1]];
 		int[][] candidates = new int[6][3];			// { row, col, isHint }
+		int[] hint = null;
 
 		int index = 0;
 		for (int i = -1; i <= 1; i++) {
@@ -250,16 +254,18 @@ public class PangGridModel {
 				continue;
 			}
 			
-			if (gridData[row][col] == target)
-				candidates[i][2] = 1;
+			if (gridData[row][col] == target) {
+				hint = new int[] { row, col };
+				break;
+			}
 		}
 
-		return candidates;
+		return hint;
 	}
 	
 	// 열방향 징검다리 힌트 찾기.
-	private int[] findHintColDirWithStep() {
-		int hint[] = null;
+	private ArrayList<int[]> findHintColDirWithStep() {
+		ArrayList<int[]> hints = new ArrayList<int[]>();
 		
 		for (int i = 0; i < gridData.length; i++) {
 			for (int j = 0; j < gridData[i].length - 2; j++) {
@@ -278,20 +284,20 @@ public class PangGridModel {
 					middle2 = gridData[i + 1][j + 1];
 				
 				if (left == middle1)
-					hint = new int[] { i - 1, j + 1 };
+					hints.add(new int[] { i - 1, j + 1 });
 				else if (left == middle2)
-					hint = new int[] { i + 1, j + 1 };
+					hints.add(new int[] { i + 1, j + 1 });
 
 			}
 		}
 
-		return hint;
+		return hints;
 	}
 	
 	
 	// 행방향 징검다리 힌트 찾기.
-	private int[] findHintRowDirWithStep() {
-		int hint[] = null;
+	private ArrayList<int[]> findHintRowDirWithStep() {
+		ArrayList<int[]> hints = new ArrayList<int[]>();
 		
 		for (int i = 0; i < gridData.length - 2; i++) {
 			for (int j = 0; j < gridData[i].length; j++) {
@@ -310,20 +316,31 @@ public class PangGridModel {
 					middle2 = gridData[i + 1][j + 1];
 				
 				if (left == middle1)
-					hint = new int[] { i + 1, j - 1 };
+					hints.add(new int[] { i + 1, j - 1 });
 				else if (left == middle2)
-					hint = new int[] { i + 1, j + 1 };
+					hints.add(new int[] { i + 1, j + 1 });
 
 			}
 		}
 
-		return hint;
+		return hints;
+	}
+	
+	private ArrayList<int[]> findHintWithStep() {
+		ArrayList<int[]> hints = findHintRowDirWithStep();
+		ArrayList<int[]> temp = findHintColDirWithStep();
+		for (int[] e : temp) {
+			hints.add(new int[] { e[0], e[1] });
+		}
+		
+		return hints;
 	}
 	
 	private void findHints() {
-		int[] hint = findHintRowDirWithStep();
-		
-		if (hint != null)
-			System.out.printf("%d %d\n", hint[0], hint[1]);
+		ArrayList<int[]> hints = findHintWithStep();
+
+		for (int[] e : hints) {
+			System.out.printf("%d %d\n", e[0], e[1]);
+		}
 	}
 }
