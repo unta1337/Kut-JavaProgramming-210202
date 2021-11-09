@@ -1,3 +1,5 @@
+// 2020136018 김성녕
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
