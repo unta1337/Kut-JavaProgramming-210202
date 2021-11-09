@@ -182,7 +182,7 @@ public class PangGridModel {
 	 * 사용자가 클릭한 두 개의 셀이 인접한 셀이고 교환하였을 때 팡이 되는지?
 	 */
 	public boolean isValidSwap(Location srcLoc, Location destLoc){
-		return true;
+		return false;
 	}
 	/**
 	 * 사용자가 선택한 두 개의 셀을 실제 교환함
