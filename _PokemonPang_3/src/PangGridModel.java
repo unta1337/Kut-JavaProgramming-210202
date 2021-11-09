@@ -182,6 +182,37 @@ public class PangGridModel {
 	 * 사용자가 클릭한 두 개의 셀이 인접한 셀이고 교환하였을 때 팡이 되는지?
 	 */
 	public boolean isValidSwap(Location srcLoc, Location destLoc){
+		boolean rowCondition = (srcLoc.r() - destLoc.r()) == 0;
+		boolean colCondition = (srcLoc.c() - destLoc.c()) == 0;
+		
+		if (!(rowCondition || colCondition))
+			return false;
+		
+		Pokemon target = gridData[srcLoc.r()][destLoc.c()];
+		int count = 1;
+
+		// 행방향 체크.
+		int y = destLoc.r() - 1;
+		while (y >= 0 && gridData[y--][destLoc.c()] == target) count++;
+
+		y = destLoc.r() + 1;
+		while (y < gridData.length && gridData[y++][destLoc.c()] == target) count++;
+		
+		if (count >= 3)
+			return true;
+
+		// 열방향 체크.
+		count = 1;
+
+		int x = destLoc.c() - 1;
+		while (x >= 0 && gridData[destLoc.r()][x--] == target) count++;
+
+		x = destLoc.c() + 1;
+		while (x < gridData[destLoc.r()].length && gridData[destLoc.r()][x++] == target) count++;
+		
+		if (count >= 3)
+			return true;
+		
 		return false;
 	}
 	/**
