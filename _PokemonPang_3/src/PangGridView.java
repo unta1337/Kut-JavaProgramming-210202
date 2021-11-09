@@ -1,17 +1,12 @@
-// 기관명: 한국기술교육대학교
-// 학년도: 2021 학년도
-// 교과목: 자바프로그래밍
-// 주차: 학기 과제 2
-// 과제명: 포켓몬팡: 힌트 제공
-// 저자: 2020136018 김성녕
-
-import java.util.ArrayList;
+import java.util.List;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -77,40 +72,34 @@ public class PangGridView extends BorderPane {
 		return statePane;
 	}
 	
+	public void updateTime(String timeLeft){
+		timeLeftField.setText(timeLeft);
+	}
+	public void updateScore(String score){
+		scoreField.setText(score);
+	}
+	public void updateCombo(String comboCount){
+		comboField.setText(comboCount);
+	}
+	
 	public void update(Pokemon[][] gridData) {
 		for(int r=0; r<PangUtility.GRIDSIZE; r++)
 			for(int c=0; c<PangUtility.GRIDSIZE; c++)
 				gridView[r][c].setImage(gridData[r][c].getImage());
 	}
 	
+	public void update(Pokemon[][] gridData, List<Location> locationList) {
+		for(Location loc: locationList)
+			gridView[loc.r()][loc.c()].setImage(gridData[loc.r()][loc.c()].getImage());
+	}
+	
+	
 	public void showEffect(Location loc) {
 		srcBorder.setLayoutX(loc.c()*PangUtility.POKETMONIMAGESIZE);
 		srcBorder.setLayoutY(loc.r()*PangUtility.POKETMONIMAGESIZE);
 		pangGrid.getChildren().add(srcBorder);
 	}
-
-	public Rectangle getHintBorder(Location loc, Color color) {
-        Rectangle hintBorder = new Rectangle(0, 0, PangUtility.POKETMONIMAGESIZE, PangUtility.POKETMONIMAGESIZE);
-
-        hintBorder.setStroke(color);
-        hintBorder.setStrokeWidth(1);
-        hintBorder.setFill(null);
-
-        hintBorder.setLayoutX(loc.c() * PangUtility.POKETMONIMAGESIZE);
-        hintBorder.setLayoutY(loc.r() * PangUtility.POKETMONIMAGESIZE);
-
-        pangGrid.getChildren().add(hintBorder);
-
-        return hintBorder;
-    }
 	
-	// 힌트 경계 표시.
-    public void showHintEffect(ArrayList<int[]> hints){
-    	for (int[] hint : hints) {
-			getHintBorder(new Location(hint[0], hint[1]), Color.BLACK);
-    	}
-    }
-
 	public void removeEffect() {
 		pangGrid.getChildren().remove(srcBorder);
 	}

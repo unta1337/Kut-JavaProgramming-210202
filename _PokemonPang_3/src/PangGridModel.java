@@ -1,13 +1,8 @@
-// 기관명: 한국기술교육대학교
-// 학년도: 2021 학년도
-// 교과목: 자바프로그래밍
-// 주차: 학기 과제 2
-// 과제명: 포켓몬팡: 힌트 제공
-// 저자: 2020136018 김성녕
-
-import java.util.Arrays;
 import java.util.ArrayList;
-import javafx.scene.paint.Color;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 한국기술교육대학교 컴퓨터공학부
@@ -19,24 +14,110 @@ import javafx.scene.paint.Color;
 public class PangGridModel {
 	private Pokemon[][] gridData 
 		= new Pokemon[PangUtility.NUMBEROFMONS][PangUtility.NUMBEROFMONS];
-	/*
-	 * 뷰 및 뷰와 통신할 때 사용하는 데이터
-	 */
+	private int gameOverCount = 60;
 	private PangGridView view;
+	// 전체가 아니라 일부 위치가 갱신하기 위한 위치 목록
+	private List<Location> locationList = new ArrayList<>();
 	
 	public PangGridModel(PangGridView view){
 		this.view = view;
 	}
 
 	public void initAssign(){
-		// 팡이 발생하지 않을 때까지 랜덤 배정.
-		do {
-			randomAssign();
-		} while (pangCheck() != null);
-		
+		randomAssign();
+		removePang();
 		view.update(gridData);
-		view.showHintEffect(findHints());
+		findHints();
 	}
+	
+	private void removePang() {
+		int[][] checkMatrix = new int[PangUtility.GRIDSIZE][PangUtility.GRIDSIZE];
+		if(checkColumn(checkMatrix)){
+			for(int r=0; r<PangUtility.GRIDSIZE; r++)
+				for(int c=0; c<PangUtility.GRIDSIZE; c++)
+					if(checkMatrix[r][c]==2) changePokemon(r,c);
+		}
+		checkMatrix = new int[PangUtility.GRIDSIZE][PangUtility.GRIDSIZE];
+		if(checkRow(checkMatrix)){
+			for(int r=0; r<PangUtility.GRIDSIZE; r++)
+				for(int c=0; c<PangUtility.GRIDSIZE; c++)
+					if(checkMatrix[r][c]==2) changePokemon(r,c);
+		}
+	}
+	
+	/**
+	 * 주어진 위치의 포켓몬을 바꾸어 팡을 제거함 
+	 * * 현재 포켓몬과 주변 4개와 다른 포켓몬으로 교체
+	 */
+	private void changePokemon(int r, int c){
+		Set<Pokemon> set = EnumSet.range(Pokemon.BULBASAUR,Pokemon.SQUIRTLE);
+		set.remove(gridData[r][c]);
+		for(var d: PangUtility.delta)
+			if(Location.valid(r+d[0],c+d[1])) set.remove(gridData[r+d[0]][c+d[1]]);
+		Pokemon[] list = new Pokemon[set.size()];
+		set.toArray(list);
+		gridData[r][c] = list[ThreadLocalRandom.current().nextInt(list.length)];
+	}
+	/**
+	 * 행 기준으로 팡의 존재를 검사  
+	 * 팡이 발견된 위치는 모두 1로 바꾸고
+	 * 초기 팡 제거를 위해 포켓몬을 바꾸어야 하는 위치는 2로 바꿈
+	 */
+	private boolean checkRow(int[][] checkMatrix){
+		boolean found = false;
+		for(int r=0; r<PangUtility.GRIDSIZE; ++r){
+			int c=0;
+			while(c<PangUtility.GRIDSIZE-2){
+				if(gridData[r][c].isNormal()){
+					int count = 1;
+					for(int i=c+1; i<PangUtility.GRIDSIZE; ++i){
+						if(gridData[r][c]==gridData[r][i]) ++count;
+						else break;
+					}
+					if(count>=3){
+						found = true;
+						for(int i=c; i<c+count; i++) checkMatrix[r][i] = 1;
+						checkMatrix[r][c+2] = 2;
+						if(count>=6) checkMatrix[r][c+5] = 2;
+					}
+					c += count;
+				}
+				else ++c;
+			}
+		}
+		return found;
+	}
+	
+	/**
+	 * 열 기준으로 팡의 존재를 검사  
+	 * 팡이 발견된 위치는 모두 1로 바꾸고
+	 * 초기 팡 제거를 위해 포켓몬을 바꾸어야 하는 위치는 2로 바꿈
+	 */
+	private boolean checkColumn(int[][] checkMatrix){
+		boolean found = false;
+		for(int c=0; c<PangUtility.GRIDSIZE; ++c){
+			int r=0;
+			while(r<PangUtility.GRIDSIZE-2){
+				if(gridData[r][c].isNormal()){
+					int count = 1;
+					for(int i=r+1; i<PangUtility.GRIDSIZE; ++i){
+						if(gridData[r][c]==gridData[i][c]) ++count;
+						else break;
+					}
+					if(count>=3){
+						found = true;
+						for(int i=r; i<r+count; ++i) checkMatrix[i][c] = 1;
+						checkMatrix[r+2][c] = 2;
+						if(count>=6) checkMatrix[r+5][c] = 2;
+					}
+					r += count;
+				}
+				else ++r;
+			}
+		}
+		return found;
+	}
+	
 	/**
 	 * 7개 포켓몬들을 임의로 배치 
 	 */
@@ -47,361 +128,191 @@ public class PangGridModel {
 			}
 		}
 	}
-	// 디버깅용
-	private void debugAssign(){
-		int[][] list = {
-			{4,4,4,4,4,4,4},
-			{3,0,2,2,2,0,1},
-			{6,3,6,0,6,0,3},
-			{6,6,5,0,2,0,5},
-			{6,2,0,2,4,3,5},
-			{6,2,3,3,3,5,5},
-			{6,1,0,5,1,4,6},
-		};
-		for(int r=0; r<gridData.length; r++){
-			for(int c=0; c<gridData[r].length; c++){
-				gridData[r][c] = Pokemon.values()[list[r][c]];
-			}
-		}
+	
+	boolean findHints(){
+		List<Location> hintLocs = getHintLocations();
+		return !hintLocs.isEmpty();
 	}
 	
-	// 그리드의 특정 행을 돌며 pangCount개 이상 나타나는 팡 체크.
-	private int[] pangCheckColDirWithRow(int row, int pangCount) {
-		Pokemon target = gridData[row][0];
-
-		int start = 0;
-		int prevStart = -1;
-
-		int count = 1;
-		int prevCount = -1;
-
-		for (int c = 1; c < gridData[row].length; c++) {
-			if (gridData[row][c] == target) {
-				count++;
-			} else {
-				prevCount = count;
-				prevStart = start;
-
-				count = 1;
-				start = c;
-				target = gridData[row][c];
-			}
-			
-			if (prevCount >= pangCount)
-				return new int[] { row, prevStart, row, prevStart + prevCount - 1 };
-			else if (c == (gridData[row].length - 1) && count >= pangCount)
-				return new int[] { row, start, row, start + count - 1 };
-		}
-
-		return null;
-	}
-	
-	// 그리드의 각 행을 돌여 팡 체크.
-	private int[] pangCheckColDir(int pangCount) {
-		for (int r = 0; r < gridData.length; r++) {
-			int[] temp = pangCheckColDirWithRow(r, pangCount);
-
-			if (temp != null)
-				return temp;
-		}
-		
-		return null;
-	}
-
-	// 그리드의 특정 열을 돌며 pangCount개 이상 나타나는 팡 체크.
-	private int[] pangCheckRowDirWithCol(int col, int pangCount) {
-		Pokemon target = gridData[0][col];
-
-		int start = 0;
-		int prevStart = -1;
-
-		int count = 1;
-		int prevCount = -1;
-
-		for (int r = 1; r < gridData.length; r++) {
-			if (gridData[r][col] == target) {
-				count++;
-			} else {
-				prevCount = count;
-				prevStart = start;
-
-				count = 1;
-				start = r;
-				target = gridData[r][col];
-			}
-			
-			if (prevCount >= pangCount)
-				return new int[] { prevStart, col, prevStart + prevCount - 1, col };
-			else if (r == (gridData.length - 1) && count >= pangCount)
-				return new int[] { start, col, start + count - 1, col };
-		}
-
-		return null;
-	}
-	
-	// 그리드의 각 열을 돌여 팡 체크.
-	private int[] pangCheckRowDir(int pangCount) {
-		for (int c = 0; c < gridData[0].length; c++) {
-			int[] temp = pangCheckRowDirWithCol(c, pangCount);
-
-			if (temp != null)
-				return temp;
-		}
-		
-		return null;
-	}
-	
-	// 그리드의 행과 열에 대해서 팡 체크.
-	// 이 메소드는 추후 재귀를 이용해 십자 형태로 나타나는 팡을 감지할 수 있음.
-	private int[] pangCheck(int pangCount) {
-		int[] row = pangCheckColDir(pangCount);
-		if (row != null)
-			return row;
-
-		int[] col = pangCheckRowDir(pangCount);
-		if (col != null)
-			return col;
-		
-		return null;
-	}
-
-	private int[] pangCheck() {
-		return pangCheck(3);
-	}
-	
-	// 열방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
-	private ArrayList<int[]> findHintColDir2InARowWithLocation(int[] location) {
-		Pokemon target = gridData[location[0]][location[1]];
-		int[][] candidates = new int[6][3];			// { row, col, isHint }
-		ArrayList<int[]> hints = new ArrayList<int[]>();
-
-		int index = 0;
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				// 꼭짓점, 자기 자신, 및 다음 항목 건너 뛰기.
-				if (Math.abs(i + j) != 1 || j == 1)
-					continue;
-				
-				candidates[index][0] = location[0] + i;
-				candidates[index++][1] = location[1] + j - 1;
-			}
-		}
-
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				// 꼭짓점, 자기 자신, 및 이전 항목 건너 뛰기.
-				if (Math.abs(i + j) != 1 || j == -1)
-					continue;
-				
-				candidates[index][0] = location[2] + i;
-				candidates[index++][1] = location[3] + j + 1;
-			}
-		}
-		
-		for (int i = 0; i < 6; i++) {
-			int row = candidates[i][0];
-			int col = candidates[i][1];
-
-			// 좌표 유효성 검사.
-			if (!(0 <= row && row < gridData.length) || !(0 <= col && col < gridData[i].length)) {
-				continue;
-			}
-			
-			if (gridData[row][col] == target)
-				hints.add(new int[] { row, col });
-		}
-
-		return hints;
-	}
-	
-	@SuppressWarnings("unused")
-	private ArrayList<int[]> findHintColDir2InARow() {
-		ArrayList<int[]> hints = new ArrayList<int[]>();
-
-		for (int i = 0; i < gridData.length; i++) {
-			for (int j = 0; j < gridData[i].length - 1; j++) {
-				Pokemon left = gridData[i][j];
-				Pokemon right = gridData[i][j + 1];
-
-				ArrayList<int[]> subHint = null;
-
-				if (left == right)
-					subHint = findHintColDir2InARowWithLocation(new int[] { i, j, i, j + 1 });
-				
-				if (subHint != null) {
-					for (int[] e : subHint) {
-						hints.add(e);
-					}
+	private List<Location> getHintLocations(){
+		List<Location> hintLocs = new ArrayList<>();
+		for(int r=0; r<PangUtility.GRIDSIZE; r++){
+			for(int c=0; c<PangUtility.GRIDSIZE; c++){
+				if(leftEquals(r,c)||rightEquals(r,c)||upEquals(r,c)||downEquals(r,c)){
+					hintLocs.add(new Location(r,c));
 				}
 			}
 		}
-
-		return hints;
+		return hintLocs;
 	}
 	
-	// 행방향으로 2개 연속인 포켓몬에 대한 힌트 찾기.
-	private ArrayList<int[]> findHintRowDir2InARowWithLocation(int[] location) {
-		Pokemon target = gridData[location[0]][location[1]];
-		int[][] candidates = new int[6][3];			// { row, col, isHint }
-		ArrayList<int[]> hints = new ArrayList<int[]>();
-
-		int index = 0;
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				// 꼭짓점, 자기 자신, 및 다음 항목 건너 뛰기.
-				if (Math.abs(i + j) != 1 || i == 1)
-					continue;
-				
-				candidates[index][0] = location[0] + i - 1;
-				candidates[index++][1] = location[1] + j;
+	/**
+	 * 팡이 있는 곳에 포켓몬을 포켓몬공으로 바꾸세요.
+	 * checkRow, checkColumn의 결과를 활용하면 쉽게 구현 가능
+	 */
+	public boolean checkAndMark(){
+		//
+		return false;
+	}
+	
+	/*
+	 * 팡 위치 위에 있는 포켓몬들을 아래로 내려 포켓볼들이 맨 위에 위치하도록 함
+	 * 열 단위로 작업하면 편리하게 구현 가능
+	 */
+	public void pushUpMarked(){
+		//
+		view.update(gridData);
+	}
+	/**
+	 * 포켓몬공이 있는 위치를 새로운 랜덤 포켓몬으로 교체함
+	 * 포켓몬공은 모두 위로 이동한 후에 사용되는 메소드
+	 */
+	public void replaceMarked(){
+		// 볼 있는 위치만 교체 
+		for(int c=0; c<PangUtility.GRIDSIZE; c++){
+			for(int r=0; r<PangUtility.GRIDSIZE; r++){
+				if(gridData[r][c]==Pokemon.POKEBALL) 
+					gridData[r][c] = Pokemon.getRandomNormalPokemon();
+				else break;
 			}
 		}
-
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				// 꼭짓점, 자기 자신, 및 이전 항목 건너 뛰기.
-				if (Math.abs(i + j) != 1 || i == -1)
-					continue;
-				
-				candidates[index][0] = location[2] + i + 1;
-				candidates[index++][1] = location[3] + j;
-			}
-		}
-		
-		for (int i = 0; i < 6; i++) {
-			int row = candidates[i][0];
-			int col = candidates[i][1];
-
-			// 좌표 유효성 검사.
-			if (!(0 <= row && row < gridData.length) || !(0 <= col && col < gridData[i].length)) {
-				continue;
-			}
-			
-			if (gridData[row][col] == target)
-				hints.add(new int[] { row, col });
-		}
-
-		return hints;
+		view.update(gridData);
 	}
-
-	private ArrayList<int[]> findHintRowDir2InARow() {
-		ArrayList<int[]> hints = new ArrayList<int[]>();
-
-		for (int i = 0; i < gridData.length - 1; i++) {
-			for (int j = 0; j < gridData[i].length; j++) {
-				Pokemon left = gridData[i][j];
-				Pokemon right = gridData[i + 1][j];
-
-				ArrayList<int[]> subHint = null;
-
-				if (left == right)
-					subHint = findHintRowDir2InARowWithLocation(new int[] { i, j, i + 1, j });
-				
-				if (subHint != null) {
-					for (int[] e : subHint) {
-						hints.add(e);
-					}
-				}
-			}
-		}
-
-		return hints;
+	/**
+	 * 사용자가 클릭한 두 개의 셀이 인접한 셀이고 교환하였을 때 팡이 되는지?
+	 */
+	public boolean isValidSwap(Location srcLoc, Location destLoc){
+		return true;
+	}
+	/**
+	 * 사용자가 선택한 두 개의 셀을 실제 교환함
+	 */
+	public void swap(Location srcLoc, Location destLoc){
+		Pokemon tmp = gridData[srcLoc.r()][srcLoc.c()];
+		gridData[srcLoc.r()][srcLoc.c()] = gridData[destLoc.r()][destLoc.c()];
+		gridData[destLoc.r()][destLoc.c()] = tmp;
+		locationList.clear();
+		locationList.add(srcLoc);
+		locationList.add(destLoc);
+		view.update(gridData, locationList);
 	}
 	
-	private ArrayList<int[]> findHint2InARow() {
-		ArrayList<int[]> hints = findHintRowDir2InARow();
-		ArrayList<int[]> temp = findHintColDir2InARow();
-		for (int[] e : temp) {
-			hints.add(new int[] { e[0], e[1] });
-		}
+	private boolean equals(Pokemon... list){
+		if(list.length<=1) throw new IllegalArgumentException();
+		Pokemon p = list[0];
+		for(int i=1; i<list.length; i++)
+			if(p!=list[i]) return false;
+		return true;
+	}
+	/*
+	 *  1) x@xx
+	 *  2) 	 x
+	 * 		x@
+	 *  	 x
+	 *  3) 	 x
+	 *  	 x
+	 *  	x@
+	 *  4) 	x@
+	 *  	 x
+	 *  	 x
+	 */
+	private boolean rightEquals(Location loc){
+		return rightEquals(loc.r(), loc.c());
+	}
+	private boolean rightEquals(int r, int c){		
+		return 
+			((Location.valid(r, c+3) // <x>@xx
+				&&equals(gridData[r][c],gridData[r][c+2],gridData[r][c+3]))||
+			(Location.valid(r-1, c+1)&&Location.valid(r+1, c+1)
+				&&equals(gridData[r][c],gridData[r-1][c+1],gridData[r+1][c+1]))||
+			(Location.valid(r-2,c+1)
+				&&equals(gridData[r][c],gridData[r-1][c+1],gridData[r-2][c+1]))||
+			(Location.valid(r+2, c+1)
+				&&equals(gridData[r][c],gridData[r+1][c+1],gridData[r+2][c+1])));
+	}
+	/*
+	 *  1) xx@x
+	 *  2) 	x
+	 * 		@x
+	 *  	x
+	 *  3) 	x
+	 *  	x
+	 *  	@x
+	 *  4) 	@x
+	 *  	x
+	 *  	x
+	 */
+	private boolean leftEquals(Location loc){
+		return leftEquals(loc.r(), loc.c());
+	}
+	private boolean leftEquals(int r, int c){		
+		return ((Location.valid(r, c-3)
+				&&equals(gridData[r][c],gridData[r][c-2],gridData[r][c-3]))||
+			(Location.valid(r-1, c-1)&&Location.valid(r+1, c-1)
+				&&equals(gridData[r][c],gridData[r-1][c-1],gridData[r+1][c-1]))||
+			(Location.valid(r-2, c-1)
+				&&equals(gridData[r][c],gridData[r-1][c-1],gridData[r-2][c-1]))||
+			(Location.valid(r+2, c-1)
+				&&equals(gridData[r][c],gridData[r+1][c-1],gridData[r+2][c-1])));
+	}
+	/*
+	 *  1) 	x
+	 *  	x
+	 *  	@
+	 *  	x
+	 *  2) 	x@x
+	 * 		 x
+	 *  3) 	xx@
+	 *  	  x
+	 *  4) 	@xx
+	 *  	x
+	 */
+	private boolean upEquals(Location loc){
+		return upEquals(loc.r(), loc.c());
+	}
+	private boolean upEquals(int r, int c){		
+		return ((Location.valid(r-3, c)
+				&&equals(gridData[r][c],gridData[r-2][c],gridData[r-3][c]))||
+			(Location.valid(r-1, c-1)&&Location.valid(r-1, c+1)
+				&&equals(gridData[r][c],gridData[r-1][c-1],gridData[r-1][c+1]))||	
+			(Location.valid(r-1, c-2)
+				&&equals(gridData[r][c],gridData[r-1][c-1],gridData[r-1][c-2]))||
+			(Location.valid(r-1, c+2)
+				&&equals(gridData[r][c],gridData[r-1][c+1],gridData[r-1][c+2])));
 		
-		return hints;
+	}
+	/*
+	 *  1) 	x
+	 *  	@
+	 *  	x
+	 *  	x
+	 *  2) 	 x
+	 * 		x@x
+	 *  3) 	  x
+	 *  	xx@
+	 *  4) 	x
+	 *  	@xx
+	 */
+	private boolean downEquals(Location loc){
+		return downEquals(loc.r(), loc.c());
+	}
+	private boolean downEquals(int r, int c){		
+		return ((Location.valid(r+3, c)
+				&&equals(gridData[r][c],gridData[r+2][c],gridData[r+3][c]))||
+			(Location.valid(r+1, c-1)&&Location.valid(r+1, c+1)
+				&&equals(gridData[r][c],gridData[r+1][c-1],gridData[r+1][c+1]))||		
+			(Location.valid(r+1, c-2)
+				&&equals(gridData[r][c],gridData[r+1][c-1],gridData[r+1][c-2]))||
+			(Location.valid(r+1, c+2)
+				&&equals(gridData[r][c],gridData[r+1][c+1],gridData[r+1][c+2])));
 	}
 	
-	// 열방향 징검다리 힌트 찾기.
-	private ArrayList<int[]> findHintColDirWithStep() {
-		ArrayList<int[]> hints = new ArrayList<int[]>();
-		
-		for (int i = 0; i < gridData.length; i++) {
-			for (int j = 0; j < gridData[i].length - 2; j++) {
-				Pokemon left = gridData[i][j];
-				Pokemon right = gridData[i][j + 2];
-				
-				if (left != right)
-					continue;
-				
-				Pokemon middle1 = null;
-				Pokemon middle2 = null;
-				
-				if (i != 0)
-					middle1 = gridData[i - 1][j + 1];
-				if (i != gridData.length - 1)
-					middle2 = gridData[i + 1][j + 1];
-				
-				if (left == middle1)
-					hints.add(new int[] { i - 1, j + 1 });
-				else if (left == middle2)
-					hints.add(new int[] { i + 1, j + 1 });
-
-			}
-		}
-
-		return hints;
+	public void updateGameTime(){
+		--gameOverCount;
+		view.updateTime(gameOverCount+"");
 	}
 	
-	
-	// 행방향 징검다리 힌트 찾기.
-	private ArrayList<int[]> findHintRowDirWithStep() {
-		ArrayList<int[]> hints = new ArrayList<int[]>();
-		
-		for (int i = 0; i < gridData.length - 2; i++) {
-			for (int j = 0; j < gridData[i].length; j++) {
-				Pokemon left = gridData[i][j];
-				Pokemon right = gridData[i + 2][j];
-
-				if (left != right)
-					continue;
-				
-				Pokemon middle1 = null;
-				Pokemon middle2 = null;
-				
-				if (j != 0)
-					middle1 = gridData[i + 1][j - 1];
-				if (j != gridData[i].length - 1)
-					middle2 = gridData[i + 1][j + 1];
-				
-				if (left == middle1)
-					hints.add(new int[] { i + 1, j - 1 });
-				else if (left == middle2)
-					hints.add(new int[] { i + 1, j + 1 });
-
-			}
-		}
-
-		return hints;
-	}
-	
-	private ArrayList<int[]> findHintWithStep() {
-		ArrayList<int[]> hints = findHintRowDirWithStep();
-		ArrayList<int[]> temp = findHintColDirWithStep();
-		for (int[] e : temp) {
-			hints.add(new int[] { e[0], e[1] });
-		}
-		
-		return hints;
-	}
-	
-	private ArrayList<int[]> findHints() {
-		ArrayList<int[]> hints = findHintWithStep();
-		ArrayList<int[]> temp = findHintRowDir2InARow();
-		for (int[] e : temp) {
-			hints.add(new int[] { e[0], e[1] });
-		}
-
-		for (int[] e : hints) {
-			System.out.printf("%d %d\n", e[0], e[1]);
-		}
-		
-		return hints;
+	public boolean isGameOver(){
+		return gameOverCount==0;
 	}
 }
