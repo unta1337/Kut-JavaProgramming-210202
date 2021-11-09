@@ -151,8 +151,22 @@ public class PangGridModel {
 	 * checkRow, checkColumn의 결과를 활용하면 쉽게 구현 가능
 	 */
 	public boolean checkAndMark(){
-		//
-		return false;
+		int[][] checkMatrix = new int[gridData.length][gridData[0].length];
+		boolean checked = false;
+		
+		checkRow(checkMatrix);
+		checkColumn(checkMatrix);
+		
+		for (int r = 0; r < gridData.length; r++) {
+			for (int c = 0; c < gridData[r].length; c++) {
+				if (checkMatrix[r][c] >= 1) {
+					gridData[r][c] = Pokemon.POKEBALL;
+					checked = true;
+				}
+			}
+		}
+		
+		return checked;
 	}
 	
 	/*
@@ -160,8 +174,21 @@ public class PangGridModel {
 	 * 열 단위로 작업하면 편리하게 구현 가능
 	 */
 	public void pushUpMarked(){
-		//
 		view.update(gridData);
+
+		for (int c = 0; c < gridData.length; c++) {
+			for (int r = gridData.length - 1; r > 0; r--) {
+				for (int rr = gridData.length - 1; rr > 0; rr--) {
+					if (gridData[rr][c] == Pokemon.POKEBALL) {
+						Pokemon temp  = gridData[rr][c];
+						gridData[rr][c] = gridData[rr - 1][c];
+						gridData[rr - 1][c] = temp;
+					}
+				}
+			}
+		}
+
+		//view.update(gridData);
 	}
 	/**
 	 * 포켓몬공이 있는 위치를 새로운 랜덤 포켓몬으로 교체함
@@ -198,6 +225,9 @@ public class PangGridModel {
 			return false;
 		
 		Pokemon target = gridData[srcLoc.r()][srcLoc.c()];
+		
+		if (target == Pokemon.POKEBALL)
+			return false;
 
 		// 행방향 체크.
 		int count = 1;
