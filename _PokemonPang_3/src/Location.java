@@ -5,6 +5,8 @@
  * 그리드 위치를 유지하는 클래스
  */
 
+// 2020136018 김성녕
+
 public record Location(int r, int c){
 	public static boolean valid(int r, int c){
 		return (r>=0&&r<PangUtility.GRIDSIZE && 
