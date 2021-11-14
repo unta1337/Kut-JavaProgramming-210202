@@ -1,3 +1,10 @@
+// 기관명: 한국기술교육대학교
+// 학년도: 2021 학년도
+// 교과목: 자바프로그래밍
+// 주차: 11 주차
+// 과제명: 단일 연결 구조 구현하기
+// 저자: 2020136018 김성녕
+
 import java.util.Iterator;
 
 /**
@@ -25,8 +32,9 @@ public class UnsortedSingleLinkedList implements Iterable<String> {
 			return curr!=null;
 		}
 		@Override public String next() {
-			// 완성하세요
-			return null;
+			Node ret = curr;
+			curr = curr != null ? curr.next : null;
+			return ret != null ? ret.item : null;
 		}
 	}
 	private Node head = null;
@@ -54,11 +62,26 @@ public class UnsortedSingleLinkedList implements Iterable<String> {
 	}
 	public String popFront() {
 		if(isEmpty()) throw new IllegalStateException();
-		// 완성하세요 
-		return null;
+		
+		Node ret = head;
+
+		head = head != tail ? head.next : tail;
+		size--;
+		
+		return ret.item;
 	}
 	public void pushBack(String item) {
-		// 완성하세요
+		Node newNode = new Node(item, null);
+
+		if (isEmpty()) {
+			head = tail = newNode;
+			size++;
+			return;
+		}
+
+		tail.next = newNode;
+		tail = newNode;
+		size++;
 	}
 	public String popBack() {
 		if(isEmpty()) throw new IllegalStateException();
@@ -92,11 +115,44 @@ public class UnsortedSingleLinkedList implements Iterable<String> {
 	}
 	// head부터 검색하여 item을 유지하는 첫 번째 노드를 삭제함 
 	public void removeFirst(String item) {
-		// 완성하세요
+		Node dummy = new Node("", head);
+		Node prev = dummy;
+		Node current = head;
+
+		while (current != null && !current.item.equals(item)) {
+			prev = current;
+			current = current.next;
+		}
+		
+		prev.next = current.next;
+		
+		if (current == head)
+			head = head.next;
+		if (current == tail)
+			tail = prev;
+
+		size--;
 	}
 	// 리스트에서 item을 유지하는 모든 노드를 삭제함
 	public void removeAll(String item) {
-		// 완성하세
+		Node prev = new Node("", head);
+		Node current = head;
+
+		while (current != null) {
+			if (current.item.equals(item)) {
+				prev.next = current.next;
+
+				if (current == head)
+					head = head.next;
+				if (current == tail)
+					tail = prev;
+
+				size--;
+			}
+
+			prev = current;
+			current = current.next;
+		}
 	}
 	@Override public Iterator<String> iterator() {
 		return new LinkedListIterator();
