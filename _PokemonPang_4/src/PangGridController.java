@@ -55,8 +55,13 @@ public class PangGridController {
 	// comboTimeIndex는 3이 최대값
 	private void restartComboTimeLine(){		
 		comboTimeline.stop();
+
 		// comboTime의 타이머의 설정 (타이머 시간은 comboTimeIndex에 의해 결정)
 		// 현재 콤보 수가 0이 아니면 새롭게 설정하지 않고 기존 설정대로 재시작하면 됨
+		
+		comboTimeline.getKeyFrames().clear();
+		comboTimeline.getKeyFrames().add(new KeyFrame(Duration.millis(comboTime[comboTimeIndex += comboTimeIndex < comboTime.length ? 1 : 0]), e -> { model.updateCombo(false); comboTimeIndex = 0; }));
+
 		comboTimeline.jumpTo(Duration.ZERO);
 		comboTimeline.play();
 	}
