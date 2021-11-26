@@ -1,3 +1,5 @@
+// 2020136018 김성녕
+
 import javafx.scene.image.Image;
 import java.util.concurrent.ThreadLocalRandom;
 

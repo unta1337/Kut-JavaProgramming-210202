@@ -1,3 +1,5 @@
+// 2020136018 김성녕
+
 import java.util.List;
 
 import javafx.animation.Animation;
