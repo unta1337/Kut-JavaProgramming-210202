@@ -21,6 +21,7 @@ public class PangGridModel {
 	private int gameOverCount = 60;
 	
 	private boolean ghostTime = false;
+	private int pangCount = 0;
 	
 	private PangGridView view;
 	// 전체가 아니라 일부 위치가 갱신하기 위한 위치 목록
@@ -191,6 +192,14 @@ public class PangGridModel {
 			ghostTime = false;
 			locationList.add(ghostLoc);
 		}
+		if (pangCount % 10 == 0) { Location dragonLoc = getNormalLoc();
+			gridData[dragonLoc.r()][dragonLoc.c()] = Pokemon.DRAGONITE;
+			locationList.add(dragonLoc);
+		}
+		if (comboCount % 10 == 0) { Location snoreLoc = getNormalLoc();
+			gridData[snoreLoc.r()][snoreLoc.c()] = Pokemon.SNORLAX;
+			locationList.add(snoreLoc);
+		}
 		view.update(gridData, locationList);
 	}
 	
@@ -213,7 +222,15 @@ public class PangGridModel {
 	}
 	
 	private void clearRowAndColumn(Location loc){
-		//
+		locationList.clear();
+
+		for (int r = 0; r < PangUtility.NUMBEROFMONS; r++)
+			changeToPokeball(r, loc.c());
+		for (int c = 0; c < PangUtility.NUMBEROFMONS; c++)
+			changeToPokeball(loc.r(), c);
+
+		updateSpecialScore(100 * (PangUtility.NUMBEROFMONS * 2 - 1));
+		view.update(gridData, locationList);
 	}
 	
 	private void removeRandomPokemon(Location loc){
@@ -234,7 +251,10 @@ public class PangGridModel {
 	}
 	
 	private void increaseGameTime(Location loc){
-		//
+		gameOverCount += 20;
+		changeToPokeball(loc.r(), loc.c());
+		updateSpecialScore(100);
+		view.update(gridData, locationList);
 	}
 	
 	/*
@@ -290,6 +310,7 @@ public class PangGridModel {
 				for(int c=0; c<PangUtility.NUMBEROFMONS; ++c)
 					if(checkMatrix[r][c]>=1) changeToPokeball(r,c);
 			view.update(gridData, locationList);
+			pangCount++;
 			return true;
 		}
 		return false;
