@@ -1,0 +1,34 @@
+import java.util.concurrent.ThreadLocalRandom;
+
+/**
+ * @copyright 한국기술교육대학교 컴퓨터공학부 자바프로그래밍
+ * @version 2021년도 1학기 학기 프로젝트: 포켓몬팡
+ * @author 김상진 
+ * 그리드 위치를 유지하는 클래스
+ */
+
+public record Location(int r, int c){
+	public boolean isRight(Location other) {
+		return r==other.r && c==other.c+1;
+	}
+	public boolean isLeft(Location other) {
+		return r==other.r && c==other.c-1;
+	}
+	public boolean isUp(Location other) {
+		return r==other.r-1 && c==other.c;
+	}
+	public boolean isDown(Location other) {
+		return r==other.r+1 && c==other.c;
+	}
+	public static boolean valid(int r, int c){
+		return (r>=0&&r<PangUtility.GRIDSIZE && 
+				c>=0&&c<PangUtility.GRIDSIZE);
+	}
+	public static Location getRandomLocation() {
+		return new Location(
+			ThreadLocalRandom.current().nextInt(PangUtility.GRIDSIZE),
+			ThreadLocalRandom.current().nextInt(PangUtility.GRIDSIZE)
+		);
+	}
+}
+
