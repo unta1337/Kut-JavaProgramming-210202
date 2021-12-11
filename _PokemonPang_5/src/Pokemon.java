@@ -20,7 +20,8 @@ public enum Pokemon {
 	POKEBALL("./image/pokeball.png"),		// 체크 용도 
 	DRAGONITE("./image/dragonite.png"), 	// 망나뇽  특수 아이템 
 	DUSKULL("./image/duskull.png"), 		// 해골  특수 아이템
-	SNORLAX("./image/snorlax.png"); 		// 잠맘보  특수 아이템
+	SNORLAX("./image/snorlax.png"), 		// 잠맘보  특수 아이템
+	JOKER("./image/joker.png"); 			// 조커  준 특수 아이템, 준 특수 아이템 취급으로 자연 생성되지는 않지만 특수 포켓몬으로 분류되지도 않음.
 	private Image image;
 	private Pokemon(String fileName){
 		this.image = new Image(fileName);

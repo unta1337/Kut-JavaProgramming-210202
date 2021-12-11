@@ -25,6 +25,7 @@ public class PangGridModel {
 	private boolean ghostTime = false;
 	private int snorlaxCount = 0;
 	private int dragoniteCount = 0;
+	private int jockerScoreCount = 1000;
 	
 	private PangGridView view;
 	// 전체가 아니라 일부 위치가 갱신하기 위한 위치 목록
@@ -39,6 +40,7 @@ public class PangGridModel {
 		removePang();
 		view.update(gridData);
 		score = comboCount = pangCount = snorlaxCount = dragoniteCount = 0;
+		jockerScoreCount = 1000;
 		gameOverCount = 60;
 		ghostTime = false;
 		view.updateCombo("0");
@@ -84,10 +86,10 @@ public class PangGridModel {
 		for(int r=0; r<PangUtility.GRIDSIZE; ++r){
 			int c=0;
 			while(c<PangUtility.GRIDSIZE-2){
-				if(gridData[r][c].isNormal()){
+				if(gridData[r][c].isNormal() || gridData[r][c] == Pokemon.JOKER) {
 					int count = 1;
 					for(int i=c+1; i<PangUtility.GRIDSIZE; ++i){
-						if(gridData[r][c]==gridData[r][i]) ++count;
+						if(gridData[r][c]==gridData[r][i] || gridData[r][i] == Pokemon.JOKER) ++count;
 						else break;
 					}
 					if(count>=3){
@@ -117,10 +119,10 @@ public class PangGridModel {
 		for(int c=0; c<PangUtility.GRIDSIZE; ++c){
 			int r=0;
 			while(r<PangUtility.GRIDSIZE-2){
-				if(gridData[r][c].isNormal()){
+				if(gridData[r][c].isNormal() || gridData[r][c] == Pokemon.JOKER){
 					int count = 1;
 					for(int i=r+1; i<PangUtility.GRIDSIZE; ++i){
-						if(gridData[r][c]==gridData[i][c]) ++count;
+						if(gridData[r][c]==gridData[i][c] || gridData[i][c] == Pokemon.JOKER) ++count;
 						else break;
 					}
 					if(count>=3){
@@ -265,6 +267,14 @@ public class PangGridModel {
 			locationList.add(dragonLoc);
 			++dragoniteCount;
 		}
+
+		// 3000점부터 시작하여 2배가 될 때마다 조커 아이템 출몰.
+		if (score >= jockerScoreCount) {
+			Location jkLoc = getNormalLoc();
+			gridData[jkLoc.r()][jkLoc.c()] = Pokemon.JOKER;
+			locationList.add(jkLoc);
+			jockerScoreCount *= 1.5;
+		}
 		view.update(gridData, locationList);
 	}
 	
@@ -329,7 +339,8 @@ public class PangGridModel {
 			locationList.clear();
 			for(int r=0; r<PangUtility.NUMBEROFMONS; ++r)
 				for(int c=0; c<PangUtility.NUMBEROFMONS; ++c)
-					if(checkMatrix[r][c]>=1) changeToPokeball(r,c);
+					if(checkMatrix[r][c]>=1)
+						changeToPokeball(r,c);
 			view.update(gridData, locationList);
 			return true;
 		}
@@ -405,8 +416,14 @@ public class PangGridModel {
 	private boolean equals(Pokemon... list){
 		if(list.length<=1) throw new IllegalArgumentException();
 		Pokemon p = list[0];
+		
+		// 만약 기준이 조커라면 다음 포켓몬을 기준으로 삼는다.
+		if (p == Pokemon.JOKER)
+			p = list[1];
+		
 		for(int i=1; i<list.length; i++)
-			if(p!=list[i]) return false;
+			// 한 번에 조커를 두 개 이상 사용할 수 없음.
+			if (p != list[i]) return false;
 		return true;
 	}
 	/*
